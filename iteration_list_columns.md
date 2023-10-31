@@ -166,3 +166,13 @@ for (i in 1:4) {
   output[[i]] = mean_and_sd(list_norm_samples[[i]])
 }
 ```
+
+### use `map` function (same results as for loop)
+
+``` r
+output = map(list_norm_samples, mean_and_sd)
+
+output = map(list_norm_samples, median)
+
+output = map(list_norm_samples, summary)
+```
