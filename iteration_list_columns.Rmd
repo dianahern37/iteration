@@ -7,5 +7,36 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(rvest)
+```
+
+Set seed for reproducibility.
+
+```{r}
+set.seed(12345)
+```
+
+## Lists
+
+```{r}
+vec_numeric = 1:4
+vec_char = c("my", "name", "is", "jeff")
+
+tibble(
+  num = vec_numeric, 
+  char = vec_char
+)
+```
+
+Different stuff with different lengths
+
+```{r}
+l = 
+  list(
+      vec_numeric = 1:5,
+      vec_char = LETTERS,
+      matrix = matrix(1:10, nrow = 5, ncol = 2),
+      summary = summary(rnorm(100))
+)
 ```
 
