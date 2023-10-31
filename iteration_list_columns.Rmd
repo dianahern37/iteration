@@ -40,3 +40,59 @@ l =
 )
 ```
 
+Accessing lists
+
+```{r}
+l$vec_char
+l[[2]]
+l[["summary"]]
+```
+
+### loops
+
+```{r}
+list_norm_samples =
+  list(
+    a = rnorm(20, 1, 5),
+    b = rnorm(20, 0, 7),
+    c = rnorm(20, 20, 1),
+    d = rnorm(20, -45, 13)
+  )
+```
+
+```{r}
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument should be numbers")
+  } else if (length(x) < 2) {
+    stop("You need at least 2 numbers to get z scores")
+  }
+
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  tibble(
+    mean = mean_x,
+    sd = sd_x
+  )
+  
+}
+```
+
+```{r}
+mean_and_sd(list_norm_samples$a)
+mean_and_sd(list_norm_samples$b)
+mean_and_sd(list_norm_samples$c)
+mean_and_sd(list_norm_samples$d)
+```
+
+```{r}
+output = vector("list", length = 4)
+
+
+for (i in 1:4) {
+  output[[i]] = mean_and_sd(list_norm_samples[[i]])
+}
+```
+
