@@ -31,6 +31,26 @@ library(rvest)
     ## 
     ##     guess_encoding
 
+``` r
+knitr::opts_chunk$set(
+    echo = TRUE,
+    warning = FALSE,
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
 Set seed for reproducibility.
 
 ``` r
@@ -40,9 +60,9 @@ set.seed(12345)
 Here’s an old function.
 
 ``` r
-sim_mean_sd = function(n_obs, mu = 5, sigma = 1) {
+sim_mean_sd = function(n_obs, true_p = .9) {
   
-  x_vec = rnorm(n = n_obs, mean = mu, sd = sigma)
+  x_vec = rbinom(n = n_obs, size = 1, prob = true_p)
 
   tibble(
     mean = mean(x_vec),
@@ -61,7 +81,7 @@ sim_mean_sd(n_obs=30)
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.08 0.938
+    ## 1   0.9 0.305
 
 Let’s iterate to see how this works UNDER REPEATED SAMPLING!
 
@@ -80,7 +100,7 @@ sim_results |>
   ggplot(aes(x = mean)) + geom_density()
 ```
 
-![](simulation_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+<img src="simulation_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ``` r
 sim_results |>
@@ -93,18 +113,104 @@ sim_results |>
     ## # A tibble: 1 × 2
     ##   mu_hat sd_hat
     ##    <dbl>  <dbl>
-    ## 1   5.00  0.180
+    ## 1  0.903 0.0518
 
 Use a map function
 
 ``` r
 sim_results_df = 
   expand_grid(
-    sample_size = 30,
+    sample_size = c(30, 60, 120, 240),
     iter = 1:100
   ) |> 
   mutate(
     estimate_df = map(sample_size, sim_mean_sd)
+  ) |> 
+  unnest(estimate_df)
+
+sim_results_df |>
+  mutate(
+    sample_size = str_c("n =", sample_size),
+    sample_size = fct_inorder(sample_size)
+  ) |>
+  ggplot(aes(x = sample_size, y = mean)) +
+  geom_boxplot()
+```
+
+<img src="simulation_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+
+## Simple linear regression
+
+Goal: To write a function that simulates data and then fits a
+regression; then repeat to look at the distribution of estimated
+coefficients.
+
+``` r
+beta_0 = 2
+beta_1 = 3
+  
+  sim_data = 
+    tibble(
+      x = rnorm(n = 30, mean = 1, sd = 1),
+      y = beta_0 + beta_1 * x + rnorm(30, mean = 0, sd = 1)
+    )
+  
+ls_fit = lm(y ~ x, data = sim_data)
+
+ls_fit
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = y ~ x, data = sim_data)
+    ## 
+    ## Coefficients:
+    ## (Intercept)            x  
+    ##       2.046        2.964
+
+``` r
+sim_data |>
+  ggplot(aes(x=x, y=y))+
+  geom_point()
+```
+
+<img src="simulation_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
+
+A function of the above.
+
+``` r
+sim_regression = function(n, beta0 = 2, beta1 = 3) {
+  
+  sim_data = 
+    tibble(
+      x = rnorm(n, mean = 1, sd = 1),
+      y = beta_0 + beta_1 * x + rnorm(n, 0, 1)
+    )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+
+sim_regression(30)
+```
+
+    ## # A tibble: 1 × 2
+    ##   beta0_hat beta1_hat
+    ##       <dbl>     <dbl>
+    ## 1      1.50      3.16
+
+``` r
+sim_results_df = 
+  expand_grid(
+    sample_size = 30,
+    iter = 1:1000
+  ) |> 
+  mutate(
+    estimate_df = map(sample_size, sim_regression)
   ) |> 
   unnest(estimate_df)
 ```
