@@ -1,0 +1,35 @@
+---
+title: "Simulation"
+author: "Diana Hernandez"
+date: "2023-11-02"
+output: github_document
+---
+
+Load key packages.
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+Set seed for reproducibility.
+
+```{r}
+set.seed(12345)
+```
+
+Here's an old function.
+
+```{r}
+sim_mean_sd = function(n_obs, mu = 5, sigma = 1) {
+  
+  x_vec = rnorm(n = n_obs, mean = mu, sd = sigma)
+
+  tibble(
+    mean = mean(x_vec),
+    sd = sd(x_vec)
+  )
+  
+}
+```
+
