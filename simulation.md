@@ -214,3 +214,36 @@ sim_results_df =
   ) |> 
   unnest(estimate_df)
 ```
+
+Let’s look at the results.
+
+``` r
+sim_results_df |>
+  summarize(
+    mean_b0_hat = mean(beta0_hat),
+    mean_b1_hat = mean(beta1_hat)
+  )
+```
+
+    ## # A tibble: 1 × 2
+    ##   mean_b0_hat mean_b1_hat
+    ##         <dbl>       <dbl>
+    ## 1        2.01        2.99
+
+``` r
+sim_results_df |>
+  ggplot(aes(x = beta0_hat)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+<img src="simulation_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
+
+``` r
+sim_results_df |>
+  ggplot(aes(x = beta0_hat, y = beta1_hat)) +
+  geom_point()
+```
+
+<img src="simulation_files/figure-gfm/unnamed-chunk-10-2.png" width="90%" />

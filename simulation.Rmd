@@ -161,3 +161,23 @@ sim_results_df =
 ```
 
 
+Let's look at the results.
+
+```{r}
+sim_results_df |>
+  summarize(
+    mean_b0_hat = mean(beta0_hat),
+    mean_b1_hat = mean(beta1_hat)
+  )
+
+
+sim_results_df |>
+  ggplot(aes(x = beta0_hat)) +
+  geom_histogram()
+
+
+sim_results_df |>
+  ggplot(aes(x = beta0_hat, y = beta1_hat)) +
+  geom_point()
+```
+
